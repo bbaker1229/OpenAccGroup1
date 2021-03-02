@@ -8,9 +8,11 @@
 #define NN 4000;
 #define MM 6000;
 
-void MatAdd(int N, int M, float *A, float *B, float *C) {
-//#pragma acc kernels copyin(A[0:M*N],B[0:M*N]), copyout(C[0:M*N])
+void MatAdd(int N, int M, float *restrict A, float *restrict B, float *restrict C) {
+#pragma acc data copyin(A[0:M*N],B[0:M*N]), copyout(C[0:M*N])
+#pragma acc parallel loop gang
 	for(int i=0; i<M; i++) {
+#pragma acc loop vector
 	  for(int j=0; j<N; j++) {
 	    C[i*N+j] = A[i*N+j] + B[i*N+j];
 	  }
