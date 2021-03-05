@@ -1,0 +1,24 @@
+Practice coding (OpenACC) 1
+Bryan Baker   bake1358
+Eric McCalla  mccal223
+Robin McManus mcman164
+---RESULTS---
+The CUDA run time found is :   0.102408 seconds with a performance of 234.356300 Mflops.
+The openACC run time found is: 0.105221 seconds with a performance of 228.091796 Mflops.
+With a difference in run time of only 0.002813 seconds slower for openACC and a performance only 6.264504 more Mflops, 
+we can assume from the similar data that our openACC function is a good parallelization.
+---CHANGES---
+We first change the include statements at the beginning of our document to be openACC specific. 
+We remove #include <unistd.h> on line 5 of MatAddN.cu, and replace it with #include <openacc.h> on line 4 of Mat_add.c.
+
+Then the largest changes occur in the MatAdd function. 
+We change the input of floats A, B, and C to be restricted. 
+The *restrict keyword tells the compiler that pointers A, B, and C may never point to the same point in memory. 
+This limits the effects of pointer aliasing and therefore, helps to optimize run time. 
+Then within the function, the addition occurring in lines 12-16 of MatAddN.cu converts to the “ #pragma acc kernel copyin(A[0:M*N],B[0:M*N]), copyout(C[0:M*N]) ” on line 12 
+which parallelizes the following nested for loops on lines 14-22 which do the computations.
+
+The main() changes are essentially only to remove CUDA specific code segments. Lines 64-70 which allocate GPU memory in MatAddN.cu are removed entirely. 
+Lines 81-96 in MatAddN.cu, which do the matrix addition in the GPU and transfer the results back to the CPU, 
+are reduced to a single line, line 71 of Mat_add.c, which states only: MatAdd(N, M, A, B, C); . 
+Finally, since we removed the allocation of GPU memory we also remove lines 110-113 which free GPU memory.
