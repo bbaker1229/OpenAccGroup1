@@ -1,6 +1,8 @@
 CC	= gcc
 FLAGS	= -fopenacc -lcuda -fcf-protection=none 
 
+all: test.ex cuda_base.ex
+
 test.ex: Mat_add.o timer.o
 	module unload soft/cuda; $(CC) $(FLAGS) Mat_add.o timer.o -o test.ex -lm 
 
